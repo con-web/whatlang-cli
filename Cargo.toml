@@ -1,0 +1,19 @@
+[package]
+name = "whatlang-cli"
+version = "0.1.0"
+edition = "2021"
+authors = ["Constantin Weber <constantin.weber@posteo.de>"]
+
+[dependencies]
+clap = {version = "4.5.8", features = ["derive"]}
+whatlang = "0.16.4"
+serde = {version = "1.0.203", features = ["derive"]}
+serde_json = {version = "1.0.120"}
+log = "*"
+env_logger = "0.11.3"
+
+
+
+[dev-dependencies]
+tempfile = "3.10.1"
+rand = "0.8.5"

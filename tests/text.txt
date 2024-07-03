@@ -1,0 +1,1 @@
+Trigramme sind ein Spezialfall des n-Gramms, wobei n gleich 3 ist. Sie werden häufig in der Verarbeitung natürlicher Sprache zur statistischen Analyse von Texten und in der Kryptographie zur Kontrolle und Verwendung von Chiffren und Codes verwendet.
