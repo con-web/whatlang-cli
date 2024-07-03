@@ -320,7 +320,7 @@ Result stderr:
 [[TIMESTAMP] DEBUG whatlang_cli] Finished processing, printing results
 ```
 
-
+Result stdout:
 ```json
 
 {
