@@ -267,10 +267,14 @@ an error. The error will be logged and the application will return with exit cod
 ./whatlang-cli -f /i/do/not/exist -f /path/to/file
 ```
 
-Result: 
-
-```json
+Result stderr:
+```
 [[TIMESTAMP] ERROR whatlang_cli] Invalid file "/i/do/not/exist": No such file or directory (os error 2). Skipping file
+```
+
+Result stdout:
+```json
+
 [
   {
     "file": "/path/to/file",
@@ -293,7 +297,7 @@ If no file is processed successfully, the application will log an error and retu
 ./whatlang-cli -f /i/do/not/exist -f /i/dont/contain/valid/utf8
 ```
 
-Result: 
+Result stderr: 
 ```
 [[TIMESTAMP] ERROR whatlang_cli] Invalid file "/i/do/not/exist": No such file or directory (os error 2). Skipping file
 [[TIMESTAMP] ERROR whatlang_cli] Invalid file "/i/dont/contain/valid/utf8": invalid utf-8 sequence of 1 bytes from index 0. Skipping file
@@ -310,11 +314,15 @@ export RUST_LOG=debug
 ./whatlang-cli "Trigrams are a special case of the n-gram, where n equals 3."
 ```
 
-Result: 
-
-```json
+Result stderr: 
+```
 [[TIMESTAMP] DEBUG whatlang_cli] Processing argument 'Trigrams are a special case of the n-gram, where n equals 3.' as plain text
 [[TIMESTAMP] DEBUG whatlang_cli] Finished processing, printing results
+```
+
+
+```json
+
 {
   "Ok": {
     "confidence": 1.0,
@@ -323,5 +331,4 @@ Result:
     "script": "Latin"
   }
 }
-
 ```
