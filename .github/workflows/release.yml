@@ -12,6 +12,24 @@ permissions:
   actions: write
 
 jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            Cargo.toml
+            Cargo.lock
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: ${{ github.event.inputs.version }}
+          body: |
+            Release ${{ github.event.inputs.version }}
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
   build:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -35,6 +53,9 @@ jobs:
           override: true
       - name: Add target
         run: rustup target add ${{ matrix.target }}
+      - name: Install aarch64-linux-gnu-gcc
+        if: matrix.os == 'ubuntu-latest' && matrix.target == 'aarch64-unknown-linux-gnu'
+        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
       - name: Zip binary (Linux)
@@ -45,15 +66,6 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           Compress-Archive -Path "./target/${{ matrix.target }}/release/whatlang-cli.exe" -DestinationPath "whatlang-cli-${{ github.event.inputs.version }}-${{ matrix.target }}.zip"
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.event.inputs.version }}
-          release_name: Release ${{ github.event.inputs.version }}
 
       - name: Upload Release Asset (Zipped)
         uses: actions/upload-release-asset@v1
