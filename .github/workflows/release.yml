@@ -80,8 +80,9 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_UPLOAD_URL: ${{ needs.create_release.upload_url.outputs.RELEASE_UPLOAD_URL }}
         with:
-          upload_url: ${{ env.RELEASE_URL }}
+          upload_url: ${{ RELEASE_UPLOAD_URL }}
           asset_path: ./whatlang-cli-${{ github.event.inputs.version }}-${{ matrix.target }}.zip
           asset_name: whatlang-cli-${{ github.event.inputs.version }}-${{ matrix.target }}.zip
           asset_content_type: application/zip
