@@ -73,7 +73,7 @@ jobs:
 
       - name: Get Release URL
         env:
-            RELEASE_UPLOAD_URL: ${{ needs.upload_url.outputs.RELEASE_UPLOAD_URL }}
+            RELEASE_UPLOAD_URL: ${{ needs.create_release.upload_url.outputs.RELEASE_UPLOAD_URL }}
         run: echo "$RELEASE_UPLOAD_URL"
 
       - name: Upload Release Asset (Zipped)
