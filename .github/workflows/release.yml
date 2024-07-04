@@ -7,11 +7,6 @@ on:
         description: 'Version'
         required: true
 
-permissions:
-  contents: write
-  actions: write
-
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -32,9 +27,10 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable-${{ matrix.target }}
+          toolchain: stable
           override: true
-          default: true
+      - name: Add target
+        run: rustup target add ${{ matrix.target }}
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
       - name: Zip binary (Linux)
