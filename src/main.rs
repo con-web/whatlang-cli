@@ -9,49 +9,105 @@ use whatlang_cli::{process_files, process_stdin, process_string};
 
 /// CLI application for detecting the language of a text wrapping the amazing whatlang-rs crate.
 ///
-/// Results are printed to stdout as JSON objects as follows:
-/// {
-///     "Ok": {
-///         "confidence": float [0,1],
-///         "is_reliable": bool,
-///         "language": string,
-///         "script": string
-///     }
-/// }
+///#### Input Modes
 ///
-/// Erroneous results are printed to stdout as JSON objects as follows:
-/// {
-///     "Error": "failed to detect language"
-/// }
+///You can use any of the input modes `TEXT`, `--stdin` and `--file` exclusively. If you try to use multiple of them,
+///the application will return an error.
 ///
-/// If --json flag is used to process input as an array of JSON strings, results are also printed as an Array:
-/// [
-///     {
-///         "Ok": {
-///            "confidence": float [0,1],
-///             "is_reliable": bool,
-///             "language": string,
-///             "script": string
-///         }
-///     },
-///     { ... }
-/// ]
-///
-/// If one or multiple files are chosen as input, results are printed as JSON objects as follows:
-/// [
-///     {
-///         "file": "path/to/file.txt,
-///         "results": [
-///             { "Ok": "{ ... }" }
-///         ]
-///     },
-///     { ... }
+///Any input mode can be combined with the `--json` flag to tell the application, that the input is a JSON array of strings.
+///So for the combination of `--file` and `--json`, the application expects a file which contains a JSON array of strings, e.g.
+///`file.json`:
+///```json
+///[
+///  "Text 1",
+///  "Text 2",
+///  "Text 3"
 ///]
+///```
+///For the combination of `--stdin` and `--json`, as well as for the combination of `TEXT` and `--json`, this holds true, as
+///the application expects a JSON array of strings in stdin or as argument.
 ///
-/// Set the desired log level with the environment variable RUST_LOG, e.g. 'export RUST_LOG=debug'.
-/// All logging goes to stderr.
+///#### Output
 ///
-/// For further documentation see:
+///If the application returns with exit code 0 which means it did process the input data successfully, it will print
+///the results as JSON objects into stdout. Depending on the input mode, the output will be a different JSON object.
+///
+///For the `TEXT` and the `--stdin` input mode, the output will be a single `Result` JSON object:
+///```json
+///{
+///  "Ok": {
+///    "confidence": "float [0,1]",
+///    "is_reliable": "bool",
+///    "language": "string",
+///    "script": "string"
+///  }
+///}
+///```
+///
+///If language detection fails, the single `Result` JSON object will contain an error message instead of the language detection result:
+///```json
+///{
+///    "Error": "Failed to detect language"
+///}
+///```
+///
+///
+///If the `--json` flag is set in addition to the `TEXT` or `--stdin` input mode, the output will be an array of `Result` JSON objects:
+///```json
+///[
+///  {
+///    "Ok": {
+///      "confidence": "float [0,1]",
+///      "is_reliable": "bool",
+///      "language": "string",
+///      "script": "string"
+///    }
+///  },
+///  {
+///    "Ok": {
+///      "confidence": "float [0,1]",
+///      "is_reliable": "bool",
+///      "language": "string",
+///      "script": "string"
+///    }
+///  }
+///]
+///```
+///
+///If the input mode is `--file`, the output will be an array of composed JSON objects containing the file path of the processed file
+///and an array of `Result` JSON objects:
+///
+///```json
+///[
+///  {
+///    "file": "string",
+///    "results": [
+///      {
+///        "Ok": {
+///          "confidence": "float [0,1]",
+///          "is_reliable": "bool",
+///          "language": "string",
+///          "script": "string"
+///        }
+///      },
+///      {
+///        "Ok": {
+///          "confidence": "float [0,1]",
+///          "is_reliable": "bool",
+///          "language": "string",
+///          "script": "string"
+///        }
+///      }
+///    ]
+///  }
+///]
+///```
+///
+///#### Logging
+///The application uses the [`env_logger`](https://github.com/rust-cli/env_logger) crate for logging. You can set the log
+///level by setting the `RUST_LOG` environment variable, e.g. `export RUST_LOG=debug`. The application will allways log to stderr.
+///
+/// For examples see:
 /// https://github.com/con-web/whatlang-cli
 ///
 /// See also:
@@ -108,6 +164,7 @@ fn main() -> ExitCode {
         return ExitCode::FAILURE;
     }
     debug!("Finished processing, printing results");
+    // safe unwrap because we checked for error above
     if let Err(e) = serde_json::to_writer_pretty(stdout(), &result.unwrap()) {
         error!("{}", e);
         return ExitCode::FAILURE;
